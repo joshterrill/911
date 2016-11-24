@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="floating-panel">
+  <b>End: </b>
+  <input type="text" id="end" placeholder="End Location" value="Golden Gate Park, San Francisco, CA">
+  <b>Be:</b>
+  <select>
+    <option value="police">Police</option>
+    <option value="ambulance">Ambulance</option>
+    <option value="firetruck">Firetruck</option>
+  </select>
+</div>
+<div id="map"></div>
+<script>
+  var map = null;
+  var markerArray = [];
+  var directionsService = null;
+  var directionsDisplay = null;
+  var icons = {
+    ambulance: "/images/ambulance.png",
+    residential: "/images/residential.png",
+    fire: "/images/fire.png",
+    firetruck: "/images/firetruck.png",
+    police: "/images/police.png"
+  };
+  vehicles = [
+    {
+      medical: [
+        {
+          id: 1001,
+          displayName: "Memorial Hospital Ambulance - 1001",
+          icon: "/images/ambulance.png"
+        },
+        {
+          id: 1003,
+          displayName: "Memorial Hospital Ambulance - 1003",
+          icon: "/images/ambulance.png"
+        },
+        {
+          id: 1005,
+          displayName: "General Hospital Ambulance - 1005",
+          icon: "/images/ambulance.png"
+        }
+      ],
+      fire: [
+        {
+          id: 9004,
+          displayName: "Firehouse 9004 Fire Truck",
+          icon: "/images/firetruck.png"
+        },
+        {
+          id: 9001,
+          displayName: "Firehouse 9001",
+          icon: "/images/firetruck.png"
+        },
+      ],
+      police: [
+        {
+          id: 1023,
+          displayName: "San Francisco PD Car 1023",
+          icon: "/images/police.png"
+        }
+      ]
+    }
+  ];
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition, positionFailure);
+      navigator.geolocation.watchPosition(function(success) {
+        console.log("%c POSITION: found new position in watch:", "background:green;color:white;");
+        console.log(success);
+        calculateAndDisplayRoute(directionsDisplay, success, directionsService);
+        map.setCenter({lat: success.coords.latitude, lng: success.coords.longitude});
+      }, function(error) {
+        console.log("%c POSITION: error in position in watch:", "background:green;color:white;");
+        console.log(error);
+      }, {enableHighAccuracy: true, maximumAge: 0});
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  }
+
+  function showPosition(position) {
+    console.log("%c POSITION: getting current position in showPosition():", "background:green;color:white;");
+    console.log(position);
+    initMap(position);
+  }
+
+  function positionFailure(error) {
+    alert(error.message);
+  }
+
+  function initMap(position) {
+    markerArray = [];
+    directionsService = new google.maps.DirectionsService;
+
+    map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 13
+    });
+
+    directionsDisplay = new google.maps.DirectionsRenderer({map: map});
+    directionsDisplay.setOptions( { polylineOptions:{strokeColor:"#33FF2A",strokeWeight:5}, suppressMarkers: true } );
+
+
+    var onChangeHandler = function() {
+      calculateAndDisplayRoute(directionsDisplay, position, directionsService);
+    };
+    document.getElementById('end').addEventListener('change', onChangeHandler);
+
+  }
+
+  function calculateAndDisplayRoute(directionsDisplay, position, directionsService) {
+    removeMarkers();
+    // Retrieve the start and end locations and create a DirectionsRequest using
+    directionsService.route({
+      origin: {lat: position.coords.latitude, lng: position.coords.longitude},
+      destination: document.getElementById('end').value,
+      travelMode: 'DRIVING'
+    }, function(response, status) {
+      if (status === 'OK') {
+        directionsDisplay.setDirections(response);
+        var leg = response.routes[ 0 ].legs[ 0 ];
+        removeMarkers();
+        makeMarker( leg.start_location, icons.police, "Police Car" );
+        makeMarker( leg.end_location, icons.fire, leg.end_address );
+      } else {
+        alert('Directions request failed due to ' + status);
+      }
+    });
+  }
+
+  function makeMarker(location, icon, title) {
+    var marker = new google.maps.Marker({
+      position: location,
+      map: map,
+      title: title,
+      icon: icon
+    });
+    markerArray.push(marker);
+  }
+
+  function removeMarkers() {
+    for (var i = 0; i < markerArray.length; i++) {
+      markerArray[i].setMap(null);
+    }
+  }
+
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwf8xkndkufIkbp4P-5NvwNOHLTFxikkk&callback=getLocation">
+</script>
+</body>
+</html>
