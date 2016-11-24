@@ -124,6 +124,8 @@
       if (status === 'OK') {
         directionsDisplay.setDirections(response);
         var leg = response.routes[ 0 ].legs[ 0 ];
+        // clear out instructions and add new ones
+        document.getElementById("instructions").innerHTML = "";
         for (var i = 0; i < leg.steps.length; i++) {
           document.getElementById("instructions").innerHTML += "<li>" + leg.steps[i].instructions + "</li>";
         }
