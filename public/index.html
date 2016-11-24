@@ -8,13 +8,11 @@
 <body>
 <div id="floating-panel">
   <b>End: </b>
-  <input type="text" id="end" placeholder="End Location" value="Golden Gate Park, San Francisco, CA">
-  <b>Be:</b>
-  <select>
-    <option value="police">Police</option>
-    <option value="ambulance">Ambulance</option>
-    <option value="firetruck">Firetruck</option>
-  </select>
+  <input type="text" id="end" placeholder="End Location" value="Golden Gate Park, San Francisco, CA"> <br />
+  <b>Directions:</b> <br />
+  <ul id="instructions">
+
+  </ul>
 </div>
 <div id="map"></div>
 <script>
@@ -126,6 +124,9 @@
       if (status === 'OK') {
         directionsDisplay.setDirections(response);
         var leg = response.routes[ 0 ].legs[ 0 ];
+        for (var i = 0; i < leg.steps.length; i++) {
+          document.getElementById("instructions").innerHTML += "<li>" + leg.steps[i].instructions + "</li>";
+        }
         removeMarkers();
         makeMarker( leg.start_location, icons.police, "Police Car" );
         makeMarker( leg.end_location, icons.fire, leg.end_address );
