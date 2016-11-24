@@ -13,6 +13,8 @@ Gets your current location, shows you on the map as a medic, police, or fire fig
 
 Change the END LOCATION and press enter for the map to update and give you new directions and route.
 
+Directions are given to you in bullet points and get updated as the map updates.
+
 ### install
 ```bash
 git clone https://github.com/joshterrill/911
