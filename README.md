@@ -21,4 +21,4 @@ npm install
 npm start
 ```
 
-Or view the live app here: https://911-dispatch.herokuapp.com (better to do it on mobile)
+Or view the live app here: https://nine-one-one.herokuapp.com (better to do it on mobile)
